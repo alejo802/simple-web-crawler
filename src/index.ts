@@ -1,22 +1,22 @@
 'use strict';
 
-import { Logger } from 'sitka';
+import { ConsoleLoggerCrawlerStorage as SimpleConsoleLoggerCrawlerStorage } from './CrawlerStorage';
+import { CrawlerWorker } from './CrawlerWorker';
+import minimist from 'minimist';
+import { SimpleHTMLDataExtractor } from './HTMLDataExtractor';
+import { SimpleHTMLFetcher } from './HTMLFetcher';
+import { SimpleHTMLParser } from './HTMLParser';
 
-export class Example {
-	/* Private Instance Fields */
 
-	private _logger: Logger;
+const worker = new CrawlerWorker(
+	new SimpleHTMLParser(),
+	new SimpleHTMLDataExtractor(),
+	new SimpleHTMLFetcher(),
+	new SimpleConsoleLoggerCrawlerStorage()
+);
 
-	/* Constructor */
+const defaultUrlToCrawl = 'https://monzo.com/';
 
-	constructor() {
-		this._logger = Logger.getLogger({ name: this.constructor.name });
-	}
+const args = minimist(process.argv);
 
-	/* Public Instance Methods */
-
-	public exampleMethod(param: string): string {
-		this._logger.debug('Received: ' + param);
-		return param;
-	}
-}
+worker.crawl(args['url'] ?? defaultUrlToCrawl, args['depth']);
